@@ -33,5 +33,4 @@ required for completing the challenge.
 
 ### What if I don't finish?
 
-If you aren't able to complete the challenge please add `TODO`s and explain what needs to be done and how you would go
-about solving that specific issue.
+Try to produce something that is at least minimally functional. Part of the exercise is to see what you prioritize first when you have a limited amount of time. For any unfinished tasks, please do add `TODO` comments to your code with a short explanation. You will be given an opportunity later to go into more detail and explain how you would go about finishing those tasks.
