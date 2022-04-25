@@ -1,14 +1,14 @@
-FROM python:3.10.0-alpine
-MAINTAINER Thermondo GmbH
+FROM python:3.10-alpine
 
-ENV PYTHONUNBUFFERED 1
+ENV PYTHONUNBUFFERED=1
+ENV PATH="/home/user/.local/bin:${PATH}"
+
+WORKDIR /app
+
+RUN adduser -D user && chown -R user:user /app
+USER user
 
 COPY ./requirements.txt /requirements.txt
-RUN pip install -r /requirements.txt
+RUN pip install --no-cache-dir -r /requirements.txt
 
-RUN mkdir /app
-WORKDIR /app
 COPY ./app /app
-
-RUN adduser -D user
-USER user
