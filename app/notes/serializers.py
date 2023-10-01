@@ -23,7 +23,7 @@ class NoteSerializer(serializers.HyperlinkedModelSerializer):
 
     class Meta:
         model = Note
-        fields = ["url", "title", "body", "tags", "author"]
+        fields = ["url", "title", "body", "tags", "author", "public"]
 
     def to_internal_value(self, data):
         # This will ensure that nonexistent tags are created when adding or
