@@ -24,7 +24,7 @@ required for completing the challenge.
 * [x] Search contents of notes with keywords
 * [x] Notes can be either public or private
     * Public notes can be viewed without authentication, however they cannot be modified
-* [ ] User management API to create new users
+* [x] User management API to create new users
 
 ### Limitations:
 

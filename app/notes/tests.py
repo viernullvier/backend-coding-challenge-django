@@ -322,3 +322,35 @@ class NoteVisibilityCase(TestCase):
         assert first["url"] == url_for_note(self.note_1_1, True)
         assert second["url"] == url_for_note(self.note_1_2, True)
         assert third["url"] == url_for_note(self.note_2_2, True)
+
+
+class UserManagementCase(TestCase):
+    def setUp(self):
+        self.client = APIClient()
+
+    def test_unauthenticated_user_can_create_account(self):
+        payload = {
+            "username": "new",
+            "password": "pass",
+            "email": "new@example.com",
+        }
+        response = self.client.post("/users/", payload)
+        assert response.status_code == 201
+        new_user = User.objects.get(username=payload["username"])
+        assert new_user.username == payload["username"]
+        assert new_user.email == payload["email"]
+
+    def test_authenticated_user_can_not_create_account(self):
+        user_1 = User.objects.create(
+            username="user1", email="user1@example.com"
+        )
+        self.client.force_authenticate(user_1)
+        payload = {
+            "username": "new",
+            "password": "pass",
+            "email": "new@example.com",
+        }
+        response = self.client.post("/users/", payload)
+        assert response.status_code == 403
+        with self.assertRaises(User.DoesNotExist):
+            User.objects.get(username=payload["username"])
