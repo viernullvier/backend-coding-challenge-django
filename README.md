@@ -22,7 +22,7 @@ required for completing the challenge.
 ### Optional Features 🚀
 
 * [x] Search contents of notes with keywords
-* [ ] Notes can be either public or private
+* [x] Notes can be either public or private
     * Public notes can be viewed without authentication, however they cannot be modified
 * [ ] User management API to create new users
 
