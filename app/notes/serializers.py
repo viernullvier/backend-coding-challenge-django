@@ -15,6 +15,7 @@ class NoteSerializer(serializers.HyperlinkedModelSerializer):
         slug_field="name",
         queryset=Tag.objects.all(),
         allow_null=True,
+        required=False,
     )
     author = serializers.HyperlinkedRelatedField(
         view_name="user-detail", read_only=True
