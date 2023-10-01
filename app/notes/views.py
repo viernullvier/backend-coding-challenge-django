@@ -4,7 +4,7 @@ from django_filters import rest_framework as df_filters
 from django.db.models import Q
 from .serializers import UserSerializer, NoteSerializer
 from .models import Note
-from .permissions import IsAuthenticatedOrPublic, IsSelf
+from .permissions import IsAuthenticatedOrPublic, UserPermission
 
 
 class UserViewSet(viewsets.ModelViewSet):
@@ -14,7 +14,7 @@ class UserViewSet(viewsets.ModelViewSet):
 
     queryset = User.objects.all().order_by("-date_joined")
     serializer_class = UserSerializer
-    permission_classes = [IsSelf]
+    permission_classes = [UserPermission]
 
 
 class NoteViewSet(viewsets.ModelViewSet):

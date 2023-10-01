@@ -10,9 +10,11 @@ class IsAuthenticatedOrPublic(BasePermission):
         return False
 
 
-class IsSelf(BasePermission):
+class UserPermission(BasePermission):
     def has_permission(self, request, view):
         if request.method in SAFE_METHODS:
+            return True
+        if request.method == "POST" and not request.user.is_authenticated:
             return True
         return False
 
