@@ -1,5 +1,5 @@
 from django.contrib.auth.models import User
-from rest_framework import viewsets, permissions
+from rest_framework import viewsets, permissions, filters
 from django_filters import rest_framework as df_filters
 from .serializers import UserSerializer, NoteSerializer
 from .models import Note
@@ -24,7 +24,8 @@ class NoteViewSet(viewsets.ModelViewSet):
     serializer_class = NoteSerializer
     permission_classes = [permissions.IsAuthenticated]
     filterset_fields = ["tags"]
-    filter_backends = [df_filters.DjangoFilterBackend]
+    filter_backends = [filters.SearchFilter, df_filters.DjangoFilterBackend]
+    search_fields = ["title", "body"]
 
     def perform_create(self, serializer):
         serializer.save(author=self.request.user)
