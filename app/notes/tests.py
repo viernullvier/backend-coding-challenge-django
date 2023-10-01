@@ -224,3 +224,101 @@ class NotesTestCase(TestCase):
         payload = response.json()
         assert len(payload) == 0
         assert response.status_code == 200
+
+
+class NoteVisibilityCase(TestCase):
+    def setUp(self):
+        # Fixtures: 2 users, 2 posts per user (1 public, 1 private)
+        self.user_1 = User.objects.create(
+            username="user1", email="user1@example.com"
+        )
+        self.note_1_1 = Note.objects.create(
+            author=self.user_1, title="private", body="body1"
+        )
+        self.note_1_2 = Note.objects.create(
+            author=self.user_1, title="public", body="body2", public=True
+        )
+        self.user_2 = User.objects.create(
+            username="user2", email="user2@example.com"
+        )
+        self.note_2_1 = Note.objects.create(
+            author=self.user_2, title="private", body="body1"
+        )
+        self.note_2_2 = Note.objects.create(
+            author=self.user_2, title="public", body="body2", public=True
+        )
+
+        self.client = APIClient()
+
+    def test_unauthenticated_user_can_view_public_notes(self):
+        response = self.client.get("/notes/")
+        payload = response.json()
+        assert len(payload) == 2
+        for note in payload:
+            self.assertIn("author", note)
+            self.assertIn("title", note)
+            self.assertIn("body", note)
+            self.assertIn("tags", note)
+            self.assertIn("url", note)
+            assert note["public"]
+
+    def test_unauthenticated_user_can_not_view_private_notes(self):
+        response = self.client.get(url_for_note(self.note_1_1))
+        assert response.status_code == 404
+        response = self.client.get(url_for_note(self.note_2_1))
+        assert response.status_code == 404
+
+    def test_unauthenticated_user_can_not_edit_private_notes(self):
+        note_url = url_for_note(self.note_1_1)
+        payload = {"title": "updated", "tags": ["new"]}
+        response = self.client.patch(note_url, payload)
+        assert response.status_code == 404
+        note = Note.objects.get(id=self.note_1_1.id)
+        assert note.title != "updated"
+
+    def test_authenticated_user_can_only_view_own_and_public_notes(self):
+        self.client.force_authenticate(self.user_1)
+        response = self.client.get(url_for_note(self.note_1_1))
+        assert response.status_code == 200
+        assert response.json()["url"] == url_for_note(self.note_1_1, True)
+        response = self.client.get(url_for_note(self.note_1_2))
+        assert response.status_code == 200
+        assert response.json()["url"] == url_for_note(self.note_1_2, True)
+        response = self.client.get(url_for_note(self.note_2_2))
+        assert response.status_code == 200
+        assert response.json()["url"] == url_for_note(self.note_2_2, True)
+        response = self.client.get(url_for_note(self.note_2_1))
+        assert response.status_code == 404
+
+    def test_authenticated_user_can_not_edit_others_public_notes(self):
+        self.client.force_authenticate(self.user_1)
+        note_url = url_for_note(self.note_2_2)
+        payload = {"title": "updated", "tags": ["new"]}
+        response = self.client.patch(note_url, payload)
+        assert response.status_code == 403
+        note = Note.objects.get(id=self.note_2_2.id)
+        assert note.title != "updated"
+
+    def test_authenticated_user_can_filter_for_public_notes(self):
+        self.client.force_authenticate(self.user_1)
+        response = self.client.get("/notes/?public=false")
+        payload = response.json()
+        assert len(payload) == 1
+        for note in payload:
+            self.assertEquals(note["author"], url_for_user(self.user_1, True))
+            assert not note["public"]
+
+        response = self.client.get("/notes/?public=true")
+        payload = response.json()
+        assert len(payload) == 2
+        first, second, *_ = payload
+        assert first["url"] == url_for_note(self.note_1_2, True)
+        assert second["url"] == url_for_note(self.note_2_2, True)
+
+        response = self.client.get("/notes/")
+        payload = response.json()
+        assert len(payload) == 3
+        first, second, third, *_ = payload
+        assert first["url"] == url_for_note(self.note_1_1, True)
+        assert second["url"] == url_for_note(self.note_1_2, True)
+        assert third["url"] == url_for_note(self.note_2_2, True)
