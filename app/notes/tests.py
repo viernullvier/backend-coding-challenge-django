@@ -8,7 +8,7 @@ HOST_URL = "http://testserver"
 
 
 def url_for_note(note, include_host=False):
-    # FIXME: Host URL is not evaluated at runtime, but hardcoded.
+    # TODO: Host URL is not evaluated at runtime, but hardcoded.
     # Might break in future dependency updates.
     url = reverse("note-detail", kwargs={"pk": note.id})
     if not include_host:
@@ -17,7 +17,7 @@ def url_for_note(note, include_host=False):
 
 
 def url_for_user(user, include_host=False):
-    # FIXME: Host URL is not evaluated at runtime, but hardcoded.
+    # TODO: Host URL is not evaluated at runtime, but hardcoded.
     # Might break in future dependency updates.
     url = reverse("user-detail", kwargs={"pk": user.id})
     if not include_host:

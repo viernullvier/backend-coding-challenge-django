@@ -28,7 +28,7 @@ class NoteSerializer(serializers.HyperlinkedModelSerializer):
     def to_internal_value(self, data):
         # This will ensure that nonexistent tags are created when adding or
         # updating notes.
-        # FIXME: This code will run _before_ validation. Requests that fail
+        # TODO: This code will run _before_ validation. Requests that fail
         # validation will still generate new tag entries, enabling attackers
         # to spam the database.
         tags = data.get("tags", [])

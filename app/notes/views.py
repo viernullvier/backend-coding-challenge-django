@@ -9,6 +9,8 @@ class UserViewSet(viewsets.ModelViewSet):
     """
     API endpoint that allows users to be viewed or edited.
     """
+    # TODO: Right now, all authenticated users can create and update users.
+    # This should only be available for admins.
 
     queryset = User.objects.all().order_by("-date_joined")
     serializer_class = UserSerializer
@@ -31,4 +33,7 @@ class NoteViewSet(viewsets.ModelViewSet):
         serializer.save(author=self.request.user)
 
     def get_queryset(self):
+        # TODO: By default, notes are ordered by insertion order. It would
+        # probably make sense to introduce created_at/updated_at fields and
+        # use them for ordering.
         return Note.objects.filter(author=self.request.user)
